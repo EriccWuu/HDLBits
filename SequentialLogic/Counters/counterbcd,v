@@ -1,0 +1,33 @@
+module top_module (
+    input clk,
+    input reset,   // Synchronous active-high reset
+    output [3:1] ena,
+    output [15:0] q);
+
+    assign ena = {q[3-:4]==4'd9 && q[7-:4]==4'd9 && q[11-:4]==4'd9, q[3-:4]==4'd9 && q[7-:4]==4'd9, q[3-:4]==4'd9};
+
+    counter10 cnt1(clk, reset, 1'b1, q[3-:4]);        
+    counter10 cnt2(clk, reset, ena[1], q[7-:4]);
+    counter10 cnt3(clk, reset, ena[2], q[11-:4]);
+    counter10 cnt4(clk, reset, ena[3], q[15-:4]);
+
+endmodule
+
+module counter10 (
+    input clk,
+    input reset,        // Synchronous active-high reset
+    input ena,
+    output reg [3:0] q);
+    
+    always @(posedge clk) begin 
+        if(reset)
+            q <= 4'b0;
+        else if(ena) begin
+            if(q == 4'd9)
+                q <= 4'b0;
+            else
+                q <= q + 1'b1;
+        end
+    end
+
+endmodule
